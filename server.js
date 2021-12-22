@@ -1,10 +1,19 @@
 const express = require('express')
+const router = require('./src/routes')
 const app = express()
+app.use(express.json())
 
-app.get('/', (req, res) => {
-    res.send('<h1>Halo world</h1>')
-})
 
+//endpoint routing
+app.use('/api/v1/', router)
+
+
+
+
+
+
+
+//port
 let port = process.env.PORT
 if (port == null || port == ""){
     port = 3000
