@@ -23,3 +23,21 @@ exports.loginUser = async (req, res) => {
         })
     }
 }
+
+exports.addUser = async (req, res) => {
+    const { fullName } = req.body
+    try {
+        const user = await User.create(req.body)
+        res.send({
+            status: 'success',
+            data: {
+                user: {fullName}
+            }
+        })
+    } catch (error) {
+        res.send({
+            status: "Failed",
+            message: "Register error"
+        })
+    }
+}
