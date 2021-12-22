@@ -1,21 +1,25 @@
 const { User } = require('../../models')
 
 exports.loginUser = async (req, res) => {
-    const { id, password } = req.params
+    const { email, password } = req.body
+    console.log(req.body, 'executed')
     try {
         const user = await User.findOne({
-            where: {id, password}
+            where: {email, password},   
         })
         res.send({
             status: "success",
             data: {
-                user
+                user: {
+                    fullName: user.fullName,
+                    email
+                }
             }
         })
     } catch (error) {
         res.send({
             status: "Failed",
-            message: "User not found"
+            message: "User or password is wrong"
         })
     }
 }

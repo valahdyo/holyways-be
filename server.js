@@ -8,11 +8,6 @@ app.use(express.json())
 app.use('/api/v1/', router)
 
 
-
-
-
-
-
 //port
 let port = process.env.PORT
 if (port == null || port == ""){
