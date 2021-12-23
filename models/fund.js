@@ -11,6 +11,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
+      Fund.belongsToMany(models.User, {
+        as: "userDonate",
+        through: {
+          model: "Transaction",
+          as: "bridge",
+        },
+        foreignKey: "idFund",
+      });
+
     }
   };
   Fund.init({
