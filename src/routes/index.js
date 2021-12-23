@@ -3,14 +3,13 @@ const express = require('express')
 const router = express.Router()
 
 //Controller
-const { loginUser, addUser } = require('../controllers/user')
-const { getFunds } = require('../controllers/fund')
+const { loginUser, addUser, getUsers, deleteUser } = require('../controllers/user')
 
 //Route
+router.get('/users', getUsers)
 router.post('/login', loginUser)
 router.post('/register', addUser)
-
-router.get('/funds', getFunds)
+router.delete('/user/:id', deleteUser)
 
 
 module.exports = router
