@@ -1,5 +1,6 @@
 const { User } = require('../../models')
 
+//Login
 exports.loginUser = async (req, res) => {
     const { email, password } = req.body
     try {
@@ -23,6 +24,7 @@ exports.loginUser = async (req, res) => {
     }
 }
 
+//Register
 exports.addUser = async (req, res) => {
     const { fullName } = req.body
     try {
@@ -41,6 +43,7 @@ exports.addUser = async (req, res) => {
     }
 }
 
+//Get all users
 exports.getUsers = async (req, res) => {
 
     try {
@@ -62,6 +65,7 @@ exports.getUsers = async (req, res) => {
     }
 }
 
+//Delete user
 exports.deleteUser = async (req, res) => {
     const {id} = req.params
     try {
