@@ -2,6 +2,8 @@ const multer = require("multer");
 const maxSize = 2 * 1024 * 1024;
 
 exports.uploadFile = (imageFile) => {
+
+    //Setting up multer (destination storage, image only, limit size)
     const storage = multer.diskStorage({
         destination: (req, file, cb) => {
           cb(null, "uploads");
@@ -29,6 +31,7 @@ exports.uploadFile = (imageFile) => {
       limits: { fileSize: maxSize },
     }).single(imageFile);
 
+    //Return to next middleware / controller if no error
     return (req, res, next) => {
         uploadFile(req, res, (err) => {
             if (!req.file && !err) {

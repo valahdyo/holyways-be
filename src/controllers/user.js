@@ -8,7 +8,7 @@ exports.getUsers = async (req, res) => {
         const user = await User.findAll({
             attributes: ["id", "fullName", "email"] 
         })
-        res.send({
+        res.status(200).send({
             status: "success",
             data: {
                 users: user
@@ -16,7 +16,7 @@ exports.getUsers = async (req, res) => {
         })
     } catch (error) {
         console.log(error)
-        res.send({
+        res.status(500).send({
             status: "Failed",
             message: "Cannot get all users"
         })

@@ -4,7 +4,7 @@ exports.authJwt = (req, res, next) => {
   const authHeader = req.header("Authorization")
   const token = authHeader && authHeader.split(' ')[1]
   if (!token) {
-    return res.status(401).send({ message: "No token provided!" });
+    return res.status(400).send({ message: "No token provided!" });
   }
 
   try {
@@ -13,6 +13,6 @@ exports.authJwt = (req, res, next) => {
     next(); 
   } catch (error) {
     console.log(error)
-    res.status(400).send({ message: "Unauthorized!" });
+    res.status(401).send({ message: "Unauthorized!" });
   }
 };

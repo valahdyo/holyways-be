@@ -15,22 +15,29 @@ exports.getFunds = async (req, res) => {
           attributes: ["donateAmount", "status", "proofAttachment"],
         },
         attributes: {
-            exclude: ["createdAt", "updatedAt"],
+            exclude: ["password", "createdAt", "updatedAt"],
           }
       },
       attributes: {
         exclude: ["createdAt", "updatedAt"],
       },
     });
-
+    //Add Image path to image name
     data = JSON.parse(JSON.stringify(data))
     data = data.map(item => {
+      item.thumbnail = IMAGE_PATH + item.thumbnail
+      if (item.userDonate) {
+        item.userDonate.map(list => {
+          list.transaction.proofAttachment = IMAGE_PATH + list.transaction.proofAttachment
+          return { ...list}
+        })
+      }
       return {
         ...item,
         thumbnail: IMAGE_PATH + item.thumbnail
       }
     })
-    res.send({
+    res.status(200).send({
       status: 'success',
       data: {
         fund: data
@@ -38,7 +45,7 @@ exports.getFunds = async (req, res) => {
     })
   } catch (error) {
     console.log(error);
-    res.send({ status: "failed", msg: "get fund error" });
+    res.status(500).send({ status: "failed", msg: "Get fund error" });
   }
 };
 
@@ -72,7 +79,7 @@ exports.addFund = async (req, res) => {
           attributes: ["donateAmount", "status", "proofAttachment"],
         },
         attributes: {
-            exclude: ["createdAt", "updatedAt"],
+          exclude: ["password", "createdAt", "updatedAt"],
           }
       },
       attributes: {
@@ -82,7 +89,7 @@ exports.addFund = async (req, res) => {
 
     
     data = JSON.parse(JSON.stringify(data))
-    res.send({
+    res.status(200).send({
       status: 'success',
       data: {
         fund: {...data, thumbnail:IMAGE_PATH+data.thumbnail}
@@ -90,7 +97,7 @@ exports.addFund = async (req, res) => {
     });
   } catch (error) {
     console.log(error)
-    res.status(401).send({status: 'failed', msg: 'add fund error'})
+    res.status(500).send({status: 'failed', msg: 'Add fund error'})
   }
 }
 
@@ -109,7 +116,7 @@ exports.getFund = async (req, res) => {
           attributes: ["donateAmount", "status", "proofAttachment"],
         },
         attributes: {
-            exclude: ["createdAt", "updatedAt"],
+          exclude: ["password", "createdAt", "updatedAt"],
           }
       },
       attributes: {
@@ -117,7 +124,16 @@ exports.getFund = async (req, res) => {
       }
     })
     data = JSON.parse(JSON.stringify(data))
-    res.send({
+    if(data.userDonate) {
+      data.userDonate.map(item => {
+        item.transaction.proofAttachment = IMAGE_PATH + item.transaction.proofAttachment
+        return {
+           ...item,
+        }
+    }) 
+    }
+   
+    res.status(200).send({
       status: 'success',
       data: {
         fund: {...data, thumbnail: IMAGE_PATH + data.thumbnail}
@@ -125,7 +141,7 @@ exports.getFund = async (req, res) => {
     });
   } catch (error) {
     console.log(error)
-    res.status(401).send({status: 'failed', msg: 'get fund error'})
+    res.status(500).send({status: 'failed', msg: 'Get fund error'})
   }
 }
 
@@ -136,7 +152,7 @@ exports.deleteFund = async (req, res) => {
       const user = await Fund.destroy({
           where: { id }
       })
-      res.send({
+      res.status(200).send({
           status: "success",
           data: {
               id
@@ -144,7 +160,7 @@ exports.deleteFund = async (req, res) => {
       })
   } catch (error) {
       console.log(error)
-      res.send({
+      res.status(500).send({
           status: "Failed",
           message: `Cannot delete fund with id ${id}`
       })
@@ -176,7 +192,7 @@ exports.updateFund = async (req, res) => {
           attributes: ["donateAmount", "status", "proofAttachment"],
         },
         attributes: {
-            exclude: ["createdAt", "updatedAt"],
+          exclude: ["password", "createdAt", "updatedAt"],
           }
       },
       attributes: {
@@ -184,7 +200,14 @@ exports.updateFund = async (req, res) => {
       }
     })
     data = JSON.parse(JSON.stringify(data))
-    res.send({
+    if(data.userDonate) {
+      data.userDonate.map(item => {
+        item.transaction.proofAttachment = IMAGE_PATH + item.transaction.proofAttachment
+        return {
+           ...item,
+        }
+    })}
+    res.status(200).send({
       status: 'success',
       data: {
         fund: {...data, thumbnail: IMAGE_PATH + data.thumbnail}
@@ -192,7 +215,7 @@ exports.updateFund = async (req, res) => {
     });
   } catch (error) {
     console.log(error)
-    res.status(401).send({status: 'failed', msg: 'edit fund error'})
+    res.status(500).send({status: 'failed', msg: 'Edit fund error'})
   }
 }
 
@@ -200,9 +223,16 @@ exports.updateFund = async (req, res) => {
 exports.updateUserDonate = async (req, res) => {
   try {
     const { idFund, idUser } = req.params
-    await Transaction.update(req.body, {
-      where: {idFund, idUser}
-    })
+
+    if (req.file) {
+      await Transaction.update({...req.body, proofAttachment:req.file.filename}, {
+        where: {idFund, idUser}
+      })
+    } else {
+      await Transaction.update(req.body, {
+        where: {idFund, idUser}
+      })
+    }
     let data = await Fund.findOne({
       where: {id:idFund},
       include: {
@@ -214,7 +244,7 @@ exports.updateUserDonate = async (req, res) => {
           attributes: ["donateAmount", "status", "proofAttachment"],
         },
         attributes: {
-            exclude: ["createdAt", "updatedAt"],
+          exclude: ["password", "createdAt", "updatedAt"],
           }
       },
       attributes: {
@@ -222,7 +252,14 @@ exports.updateUserDonate = async (req, res) => {
       }
     })
     data = JSON.parse(JSON.stringify(data))
-    res.send({
+    if(data.userDonate) {
+      data.userDonate.map(item => {
+        item.transaction.proofAttachment = IMAGE_PATH + item.transaction.proofAttachment
+        return {
+           ...item,
+        }
+    })}
+    res.status(200).send({
       status: 'success',
       data: {
         fund: {...data, thumbnail: IMAGE_PATH + data.thumbnail}
@@ -230,6 +267,6 @@ exports.updateUserDonate = async (req, res) => {
     });
   } catch (error) {
     console.log(error)
-    res.status(401).send({status: 'failed', msg: 'update donate by fund error'})
+    res.status(500).send({status: 'failed', msg: 'Update donate by fund error'})
   }
 }

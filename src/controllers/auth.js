@@ -39,7 +39,7 @@ exports.loginUser = async (req, res) => {
     const accessToken = jwt.sign({ id: user.id }, process.env.SECRET_TOKEN, {
         expiresIn: 86400 // 24 hours
       });
-        res.send({
+        res.status(200).send({
             status: "success",
             data: {
                 user: {
@@ -51,7 +51,7 @@ exports.loginUser = async (req, res) => {
         })
     } catch (error) {
         console.log(error);
-        res.send({
+        res.status(400).send({
             status: "Failed",
             message: "User or password is doesn't match"
         })
@@ -79,15 +79,18 @@ exports.registerUser = async (req, res) => {
     try {
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        await User.create({
+        const user = await User.create({
             fullName,
             email,
             password: hashedPassword
         })
-        res.send({
+        const accessToken = jwt.sign({ id: user.id }, process.env.SECRET_TOKEN, {
+            expiresIn: 86400 // 24 hours
+          });
+        res.status(201).send({
             status: 'success',
             data: {
-                user: {fullName}
+                user: {fullName, accessToken}
             }
         })
     } catch (error) {
