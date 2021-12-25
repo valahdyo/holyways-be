@@ -12,7 +12,7 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false
       },
-      thumbnaill: {
+      thumbnail: {
         type: Sequelize.STRING
       },
       goal: {

@@ -3,20 +3,28 @@ const express = require('express')
 const router = express.Router()
 
 //Controller
-const { loginUser, addUser, getUsers, deleteUser } = require('../controllers/user')
+const { loginUser, registerUser } = require('../controllers/auth')
+const { getUsers, deleteUser } = require('../controllers/user')
 const { getFunds, getFund, addFund, updateFund, deleteFund, updateUserDonate } = require('../controllers/fund')
 
-//Route
-router.get('/users', getUsers)
+//Middleware
+const { checkDuplicateEmail } = require('../middleware/verifyRegister')
+const { authJwt } = require('../middleware/authJwt')
+const { uploadFile } = require('../middleware/uploadFile')
+//Route Auth Controller
 router.post('/login', loginUser)
-router.post('/register', addUser)
+router.post('/register', checkDuplicateEmail, registerUser)
+
+//Route User Controller
+router.get('/users', getUsers)
 router.delete('/user/:id', deleteUser)
 
+//Route Fund Controller
 router.get('/funds', getFunds)
 router.get('/fund/:id', getFund)
-router.post('/fund', addFund)
-router.patch('/fund/:id', updateFund)
-router.patch('/fund/:idFund/:idUser', updateUserDonate)
-router.delete('/fund/:id', deleteFund)
+router.post('/fund', authJwt, uploadFile("thumbnail"), addFund)
+router.patch('/fund/:id', authJwt, uploadFile("thumbnail"), updateFund)
+router.patch('/fund/:idFund/:idUser', authJwt, updateUserDonate)
+router.delete('/fund/:id', authJwt, deleteFund)
 
 module.exports = router
